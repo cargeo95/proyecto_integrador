@@ -9,5 +9,4 @@ SELECT
   COUNT(*) AS Ammount
 FROM olist_orders_dataset AS o
 GROUP BY o.order_status
-ORDER BY Ammount ASC, o.order_status;
-
+ORDER BY o.order_status;

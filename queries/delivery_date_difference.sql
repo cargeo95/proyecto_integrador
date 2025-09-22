@@ -11,18 +11,22 @@
 
 
 -- Diferencia promedio (en días) entre fecha real y estimada de entrega por estado (cliente)
-
 -- delivery_date_difference.sql
+-- Diferencia promedio entre fecha de entrega real y estimada, por estado
+
 SELECT
   c.customer_state AS State,
-  CAST(ROUND(AVG(
-    julianday(date(STRFTIME('%Y-%m-%d', o.order_estimated_delivery_date)))
-    - julianday(date(STRFTIME('%Y-%m-%d', o.order_delivered_customer_date)))
-  ), 0) AS INT) AS Delivery_Difference
+  CAST(
+    AVG(
+      JULIANDAY(DATE(o.order_estimated_delivery_date))
+      - JULIANDAY(DATE(o.order_delivered_customer_date))
+    ) AS INT
+  ) AS Delivery_Difference
 FROM olist_orders_dataset AS o
-JOIN olist_customers_dataset AS c USING (customer_id)
+JOIN olist_customers_dataset AS c
+  ON o.customer_id = c.customer_id
 WHERE o.order_status = 'delivered'
   AND o.order_delivered_customer_date IS NOT NULL
   AND o.order_estimated_delivery_date IS NOT NULL
 GROUP BY c.customer_state
-ORDER BY c.customer_state;
+ORDER BY Delivery_Difference ASC, State;
