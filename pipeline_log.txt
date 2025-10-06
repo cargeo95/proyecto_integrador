@@ -1,0 +1,58 @@
+2025-10-05 20:31:35,776 - INFO - \U0001f680 Inicio del pipeline ELT
+2025-10-05 20:31:35,831 - INFO - \U0001f539 Fase 1: Extracci�n de datos
+2025-10-05 20:31:35,831 - ERROR - \u274c Error en el pipeline: module 'src.extract' has no attribute 'run_all'
+2025-10-05 20:33:07,834 - INFO - \U0001f680 Inicio del pipeline ELT
+2025-10-05 20:33:07,836 - INFO - \U0001f539 Fase 1: Extracci�n de datos
+2025-10-05 20:33:07,836 - ERROR - \u274c Error en el pipeline: module 'src.extract' has no attribute 'run_all'
+2025-10-05 20:37:54,833 - INFO - \U0001f680 Inicio del pipeline ELT
+2025-10-05 20:37:54,833 - INFO - \U0001f539 Fase 1: Extracci�n de datos
+2025-10-05 20:37:58,793 - INFO - \U0001f539 Fase 2: Carga de datos al Data Warehouse (SQLite)
+2025-10-05 20:37:59,851 - INFO - \U0001f539 Fase 3: Transformaci�n SQL
+2025-10-05 20:37:59,979 - ERROR - \u274c Error en el pipeline: (sqlite3.OperationalError) no such table: olist_orders_dataset
+[SQL: -- TODO: Esta consulta devolverá una tabla con dos columnas: Estado y 
+-- Diferencia_Entrega. La primera contendrá las letras que identifican los 
+-- estados, y la segunda mostrará la diferencia promedio entre la fecha estimada 
+-- de entrega y la fecha en la que los productos fueron realmente entregados al 
+-- cliente.
+-- PISTAS:
+-- 1. Puedes usar la función julianday para convertir una fecha a un número.
+-- 2. Puedes usar la función CAST para convertir un número a un entero.
+-- 3. Puedes usar la función STRFTIME para convertir order_delivered_customer_date a una cadena, eliminando horas, minutos y segundos.
+-- 4. order_status == 'delivered' AND order_delivered_customer_date IS NOT NULL
+
+
+-- Diferencia promedio (en días) entre fecha real y estimada de entrega por estado (cliente)
+-- delivery_date_difference.sql
+-- Diferencia promedio entre fecha de entrega real y estimada, por estado
+
+SELECT
+  c.customer_state AS State,
+  CAST(
+    AVG(
+      JULIANDAY(DATE(o.order_estimated_delivery_date))
+      - JULIANDAY(DATE(o.order_delivered_customer_date))
+    ) AS INT
+  ) AS Delivery_Difference
+FROM olist_orders_dataset AS o
+JOIN olist_customers_dataset AS c
+  ON o.customer_id = c.customer_id
+WHERE o.order_status = 'delivered'
+  AND o.order_delivered_customer_date IS NOT NULL
+  AND o.order_estimated_delivery_date IS NOT NULL
+GROUP BY c.customer_state
+ORDER BY Delivery_Difference ASC, State;]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+2025-10-05 20:40:27,290 - INFO - \U0001f680 Inicio del pipeline ELT
+2025-10-05 20:40:27,290 - INFO - \U0001f539 Fase 1: Extracci�n de datos
+2025-10-05 20:40:30,245 - INFO - \U0001f539 Fase 2: Carga de datos al Data Warehouse (SQLite)
+2025-10-05 20:40:31,271 - INFO - \U0001f539 Fase 3: Transformaci�n SQL
+2025-10-05 20:40:37,188 - ERROR - \u274c Error en el pipeline: (sqlite3.OperationalError) no such table: olist_orders
+[SQL: SELECT * FROM olist_orders]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)
+2025-10-05 20:46:23,066 - INFO - \U0001f680 Inicio del pipeline ELT
+2025-10-05 20:46:23,067 - INFO - \U0001f539 Fase 1: Extracci�n de datos
+2025-10-05 20:46:26,078 - INFO - \U0001f539 Fase 2: Carga de datos al Data Warehouse (SQLite)
+2025-10-05 20:46:27,102 - INFO - \U0001f539 Fase 3: Transformaci�n SQL
+2025-10-05 20:46:32,629 - ERROR - \u274c Error en el pipeline: (sqlite3.OperationalError) no such table: olist_orders
+[SQL: SELECT * FROM olist_orders]
+(Background on this error at: https://sqlalche.me/e/14/e3q8)

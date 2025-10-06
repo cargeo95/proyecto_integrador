@@ -3,6 +3,7 @@ from pathlib import Path
 
 import requests
 from pandas import DataFrame, read_csv, read_json, to_datetime
+from src.config import DATASET_ROOT_PATH, PUBLIC_HOLIDAYS_URL, get_csv_to_table_mapping
 
 
 def temp() -> DataFrame:
@@ -41,3 +42,25 @@ def extract(
     holidays = get_public_holidays(public_holidays_url, "2017")
     dataframes["public_holidays"] = holidays
     return dataframes
+
+
+def run_all():
+    """Ejecuta la fase de extracción de datos"""
+    from pandas import DataFrame
+
+    print("🔹 [EXTRACT] Iniciando extracción de datos...")
+    try:
+        # Usa las funciones ya definidas en tu módulo
+        mapping = get_csv_to_table_mapping()
+        data_frames = extract(DATASET_ROOT_PATH, mapping, PUBLIC_HOLIDAYS_URL)
+
+        # Validación simple
+        if isinstance(data_frames, dict) and all(isinstance(v, DataFrame) for v in data_frames.values()):
+            print(f"✅ [EXTRACT] {len(data_frames)} tablas extraídas correctamente.")
+        else:
+            print("⚠ [EXTRACT] No se devolvió un diccionario válido de DataFrames.")
+        return data_frames
+
+    except Exception as e:
+        print(f"❌ [EXTRACT] Error en la extracción: {e}")
+        raise

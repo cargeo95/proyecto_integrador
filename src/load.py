@@ -2,6 +2,8 @@
 from typing import Dict
 from pandas import DataFrame
 from sqlalchemy.engine.base import Engine
+from sqlalchemy import create_engine
+from src.config import SQLITE_BD_ABSOLUTE_PATH
 
 # Mapeo opcional por si te llegan nombres "cortos" desde extract()
 TABLE_NAME_MAPPING = {
@@ -50,3 +52,22 @@ def load(data_frames: Dict[str, DataFrame], database: Engine) -> None:
             CREATE VIEW olist_products AS
             SELECT * FROM olist_products_dataset;
         """)
+
+def run_all(data_frames=None):
+    """Ejecuta la fase de carga de datos en SQLite"""
+    print("🔹 [LOAD] Iniciando carga de datos en la base de datos...")
+
+    try:
+        engine = create_engine(f"sqlite:///{SQLITE_BD_ABSOLUTE_PATH}")
+
+        # Si se llamó sin data_frames (por prueba), no hace nada
+        if data_frames:
+            load(data_frames, engine)
+            print(f"✅ [LOAD] Datos cargados exitosamente en {SQLITE_BD_ABSOLUTE_PATH}")
+        else:
+            print("ℹ [LOAD] No se recibieron dataframes, solo se conectó la base de datos.")
+        return engine
+
+    except Exception as e:
+        print(f"❌ [LOAD] Error al cargar los datos: {e}")
+        raise
